@@ -1,115 +1,227 @@
-import Image from "next/image";
-import localFont from "next/font/local";
+import { useState } from 'react';
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+interface Finding {
+  type: string;
+  subtype: string;
+  line: number;
+  severity: string;
+  message: string;
+  suggestion?: string;
+}
+
+interface ReviewResult {
+  total_findings: number;
+  summary: string;
+  findings: Finding[];
+  severity_counts: Record<string, number>;
+}
 
 export default function Home() {
-  return (
-    <div
-      className={`${geistSans.variable} ${geistMono.variable} grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]`}
-    >
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              pages/index.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [code, setCode] = useState("");
+  const [filename, setFilename] = useState("code.py");
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<ReviewResult | null>(null);
+  const [error, setError] = useState("");
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const handleReview = async () => {
+    if (!code.trim()) {
+      setError("Please enter some code");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+    setResult(null);
+
+    try {
+      console.log("===== REVIEW BUTTON CLICKED =====");
+
+      const response = await fetch("http://127.0.0.1:8000/api/review/code", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          code,
+          filename,
+        }),
+      });
+
+      console.log("HTTP Status:", response.status);
+
+      const data = await response.json();
+
+      console.log("Backend Response:", data);
+
+      if (!response.ok) {
+        setError(data.detail || "Backend returned an error");
+      } else if (data.status === "success") {
+        setResult(data.review);
+      } else {
+        setError(data.error || "Unknown backend error");
+      }
+    } catch (err: any) {
+      console.error("FETCH ERROR:", err);
+      setError(err.message || "Cannot connect to backend.");
+    }
+
+    setLoading(false);
+  };
+
+  const handleDemo = async () => {
+    try {
+      console.log("Demo clicked");
+
+      const response = await fetch("http://127.0.0.1:8000/api/review/demo");
+
+      const data = await response.json();
+
+      console.log(data);
+
+      if (data.status === "success") {
+        setResult(data.review);
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Cannot connect to backend.");
+    }
+  };
+
+  const getSeverityColor = (severity: string) => {
+    switch (severity.toUpperCase()) {
+      case "CRITICAL":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "HIGH":
+        return "bg-orange-100 text-orange-800 border-orange-200";
+      case "MEDIUM":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "LOW":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-950 text-white">
+      <header className="border-b border-gray-800 px-6 py-4">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🤖</span>
+            <div>
+              <h1 className="text-xl font-bold">Code Review Agent</h1>
+              <p className="text-xs text-gray-400">
+                AI-powered multi-agent code analysis
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+            <span className="text-sm text-gray-400">3 Agents Active</span>
+          </div>
         </div>
+      </header>
+
+      <main className="max-w-6xl mx-auto px-6 py-8">
+
+        <div className="text-center mb-10">
+          <h2 className="text-4xl font-bold mb-3">
+            Review Code with{" "}
+            <span className="text-blue-400">AI Agents</span>
+          </h2>
+
+          <p className="text-gray-400 text-lg">
+            SecurityAgent + QualityAgent + AnalystAgent working together
+          </p>
+        </div>
+
+        <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 mb-6">
+
+          <div className="flex gap-4 mb-4">
+
+            <input
+              type="text"
+              value={filename}
+              onChange={(e) => setFilename(e.target.value)}
+              className="w-48 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg"
+            />
+
+            <button
+              onClick={handleDemo}
+              className="px-4 py-2 bg-gray-700 rounded-lg"
+            >
+              Try Demo
+            </button>
+
+          </div>
+
+          <textarea
+            rows={12}
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            placeholder="Paste your code here..."
+            className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg font-mono"
+          />
+
+          {error && (
+            <div className="mt-4 p-3 bg-red-900 border border-red-700 rounded">
+              {error}
+            </div>
+          )}
+
+          <button
+            onClick={handleReview}
+            disabled={loading}
+            className="mt-4 w-full py-3 bg-blue-600 rounded-lg"
+          >
+            {loading ? "Analyzing..." : "🚀 Review Code"}
+          </button>
+
+        </div>
+
+        {result && (
+          <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
+
+            <h2 className="text-xl font-bold mb-4">
+              Review Results
+            </h2>
+
+            <p className="mb-6 text-green-400">
+              {result.summary}
+            </p>
+
+            {result.findings.map((f, i) => (
+              <div
+                key={i}
+                className="border border-gray-700 rounded-lg p-4 mb-3"
+              >
+                <span
+                  className={`px-2 py-1 rounded text-xs font-bold ${getSeverityColor(
+                    f.severity
+                  )}`}
+                >
+                  {f.severity}
+                </span>
+
+                <p className="mt-3">{f.message}</p>
+
+                <p className="text-gray-400 text-sm">
+                  Line {f.line}
+                </p>
+
+                {f.suggestion && (
+                  <p className="text-green-400 mt-2">
+                    💡 {f.suggestion}
+                  </p>
+                )}
+              </div>
+            ))}
+
+          </div>
+        )}
+
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
   );
 }
