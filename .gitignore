@@ -1,0 +1,15 @@
+﻿venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.env
+*.env
+node_modules/
+.next/
+.vercel/
+*.log
+.vscode/
+.idea/
+*.db
+*.sqlite
