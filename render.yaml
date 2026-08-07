@@ -8,5 +8,3 @@ services:
     envVars:
       - key: GROQ_API_KEY
         sync: false
-      - key: SECRET_KEY
-        sync: false
