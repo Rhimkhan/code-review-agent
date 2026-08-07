@@ -23,6 +23,8 @@ export default function Home() {
   const [result, setResult] = useState<ReviewResult | null>(null);
   const [error, setError] = useState("");
 
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+
   const handleReview = async () => {
     if (!code.trim()) {
       setError("Please enter some code");
@@ -36,7 +38,7 @@ export default function Home() {
     try {
       console.log("===== REVIEW BUTTON CLICKED =====");
 
-      const response = await fetch("http://127.0.0.1:8000/api/review/code", {
+      const response = await fetch(`${API_BASE}/api/review/code`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -72,7 +74,7 @@ export default function Home() {
     try {
       console.log("Demo clicked");
 
-      const response = await fetch("http://127.0.0.1:8000/api/review/demo");
+      const response = await fetch(`${API_BASE}/api/review/demo`);
 
       const data = await response.json();
 
