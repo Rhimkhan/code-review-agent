@@ -51,3 +51,17 @@ In active development
 2. Set root directory to `frontend`
 3. Add NEXT_PUBLIC_API_URL
 4. Deploy!
+
+## Deployment
+
+### Backend (Render)
+1. Connect GitHub repo to Render
+2. Set root directory to `backend`
+3. Add environment variables
+4. Deploy!
+
+### Frontend (Vercel)
+1. Connect GitHub repo to Vercel
+2. Set root directory to `frontend`
+3. Add NEXT_PUBLIC_API_URL
+4. Deploy!
