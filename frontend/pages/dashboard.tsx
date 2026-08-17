@@ -25,12 +25,14 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+
   const handleReview = async () => {
     if (!code.trim()) { setError("Paste some code first."); return; }
     setError("");
     setLoading(true);
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/review/code", {
+      const res = await fetch(`${API_BASE}/api/review/code`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code, filename }),
