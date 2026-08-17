@@ -1,9 +1,5 @@
-from fastapi import Header, HTTPException
+from fastapi import Header
 from typing import Optional
-
-async def verify_api_key(x_api_key: Optional[str] = Header(None)):
-    """Optional API key verification for future auth"""
-    return True
 
 async def get_request_context(
     user_agent: Optional[str] = Header(None),
