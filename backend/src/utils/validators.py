@@ -7,7 +7,7 @@ def validate_code_input(code: str, filename: str) -> Tuple[bool, str]:
         return False, "Code too large (max 50000 chars)"
     if not filename:
         return False, "Filename is required"
-    allowed_extensions = [".py", ".js", ".ts", ".java", ".go", ".rs", ".cpp", ".rb"]
-    if not any(filename.endswith(ext) for ext in allowed_extensions):
-        return False, f"Unsupported file type"
+    allowed = [".py", ".js", ".ts", ".java", ".go", ".rs", ".cpp", ".rb"]
+    if not any(filename.endswith(ext) for ext in allowed):
+        return False, "Unsupported file type"
     return True, "Valid"
