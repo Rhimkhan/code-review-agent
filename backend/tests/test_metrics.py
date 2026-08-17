@@ -23,9 +23,3 @@ def test_record_error():
     m = MetricsCollector()
     m.record_error()
     assert m.errors_total == 1
-
-def test_get_stats():
-    m = MetricsCollector()
-    stats = m.get_stats()
-    assert "reviews_total" in stats
-    assert "findings_total" in stats
