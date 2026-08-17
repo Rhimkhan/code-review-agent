@@ -3,7 +3,6 @@ from typing import Dict, List
 from dataclasses import dataclass, field
 from datetime import datetime
 
-
 @dataclass
 class AgentResult:
     agent_name: str
