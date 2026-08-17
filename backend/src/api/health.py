@@ -3,15 +3,15 @@ from datetime import datetime
 
 router = APIRouter()
 
-@router.get("/health")
-async def health_check():
-    return {
-        "status": "ok",
-        "version": "1.0.0",
-        "timestamp": datetime.now().isoformat(),
-        "agents": ["SecurityAgent", "QualityAgent", "AnalystAgent"]
-    }
-
 @router.get("/ping")
 async def ping():
-    return {"message": "pong"}
+    return {"message": "pong", "timestamp": datetime.now().isoformat()}
+
+@router.get("/status")
+async def status():
+    return {
+        "status": "online",
+        "version": "1.0.0",
+        "agents": 3,
+        "uptime": "running"
+    }
