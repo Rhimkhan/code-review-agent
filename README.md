@@ -17,7 +17,7 @@ An AI-powered multi-agent system that reviews code for bugs, security vulnerabil
 ## Setup
 cd backend
 python -m venv venv
-pip install -r requirements.txt
+pip install -r requirements.txt, use UV command by Astral.sh instead of this 
 cp .env.example .env
 python run.py
 
