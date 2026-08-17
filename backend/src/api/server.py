@@ -1,26 +1,18 @@
-from fastapi import FastAPI, HTTPException, Request
+import os
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel
-from slowapi import Limiter
+from dotenv import load_dotenv
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
-from slowapi.middleware import SlowAPIMiddleware
-from slowapi import _rate_limit_exceeded_handler
-import traceback
-
 from src.agents.orchestrator import Orchestrator
 from src.middleware.rate_limiter import limiter
-from src.auth.routes import router as auth_router
 
-app = FastAPI(
-    title="Code Review Agent API",
-    description="AI-powered multi-agent code review system",
-    version="1.0.0",
-)
+load_dotenv()
 
+app = FastAPI(title="Code Review Agent", version="1.0.0")
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
-app.add_middleware(SlowAPIMiddleware)
 
 app.add_middleware(
     CORSMiddleware,
@@ -30,82 +22,36 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth_router, prefix="/api")
-
 orchestrator = Orchestrator()
-
-
-class CodeReviewRequest(BaseModel):
-    code: str
-    filename: str = "code.py"
-
-
-class PRReviewRequest(BaseModel):
-    repo: str
-    pr_number: int
-
 
 @app.get("/health")
 async def health():
-    return {"status": "healthy"}
-
+    return {"status": "ok", "version": "1.0.0", "agents": 3}
 
 @app.post("/api/review/code")
-@limiter.limit("5/minute")
-async def review_code(request: Request, body: CodeReviewRequest):
-    try:
-        review = await orchestrator.review_code(body.code, body.filename)
-
-        return {
-            "status": "success",
-            "review": review
-        }
-
-    except Exception as e:
-        traceback.print_exc()
-
-        return JSONResponse(
-            status_code=500,
-            content={
-                "status": "error",
-                "error": str(e),
-                "type": type(e).__name__
-            },
-        )
-
+async def review_code(request: dict):
+    code = request.get("code", "")
+    filename = request.get("filename", "code.py")
+    result = await orchestrator.review_code(code=code, filename=filename)
+    return {"status": "success", "review": result}
 
 @app.get("/api/review/demo")
 async def demo_review():
-    sample_code = """
-def hello(name):
-    print("Hello", name)
-"""
+    demo_code = """
+import sqlite3
+SECRET_KEY = "hardcoded_secret"
 
+def get_user(username):
+    conn = sqlite3.connect("users.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users WHERE name = '" + username + "'")
+    return cursor.fetchone()
+
+def process(a, b, c, d, e, f, g):
     try:
-        review = await orchestrator.review_code(sample_code, "demo.py")
-
-        return {
-            "status": "success",
-            "review": review
-        }
-
-    except Exception as e:
-        traceback.print_exc()
-
-        return JSONResponse(
-            status_code=500,
-            content={
-                "status": "error",
-                "error": str(e),
-                "type": type(e).__name__
-            },
-        )
-
-
-@app.post("/api/review/pr")
-@limiter.limit("3/minute")
-async def review_pr(request: Request, body: PRReviewRequest):
-    return {
-        "status": "success",
-        "message": "PR review not implemented yet"
-    }
+        return a+b+c+d+e+f+g
+    except:
+        pass
+"""
+    result = await orchestrator.review_code(code=demo_code, filename="demo.py")
+    return {"status": "success", "review": result}
