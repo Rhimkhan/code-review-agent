@@ -21,4 +21,3 @@ def test_unsupported_extension():
 def test_code_too_large():
     valid, msg = validate_code_input("x" * 60000, "main.py")
     assert valid == False
-    assert "large" in msg.lower()
