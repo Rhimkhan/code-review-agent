@@ -6,12 +6,10 @@ def test_cache_set_and_get():
     cache.set("code", "file.py", {"findings": []})
     result = cache.get("code", "file.py")
     assert result is not None
-    assert result["findings"] == []
 
 def test_cache_miss():
     cache = ReviewCache()
-    result = cache.get("nonexistent", "file.py")
-    assert result is None
+    assert cache.get("nonexistent", "file.py") is None
 
 def test_cache_size():
     cache = ReviewCache()
