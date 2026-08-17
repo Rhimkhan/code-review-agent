@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Dict, List
 
 class MetricsCollector:
@@ -17,15 +16,12 @@ class MetricsCollector:
         self.errors_total += 1
 
     def get_stats(self) -> Dict:
-        avg_time = (
-            sum(self.response_times) / len(self.response_times)
-            if self.response_times else 0
-        )
+        avg = sum(self.response_times) / len(self.response_times) if self.response_times else 0
         return {
             "reviews_total": self.reviews_total,
             "findings_total": self.findings_total,
             "errors_total": self.errors_total,
-            "avg_response_time_ms": round(avg_time, 2),
+            "avg_response_time_ms": round(avg, 2),
         }
 
 metrics = MetricsCollector()
