@@ -12,9 +12,8 @@ export default function Terms() {
       <main className="max-w-3xl mx-auto px-8 pt-20">
         <h1 className="text-4xl font-bold mb-6">Terms of Service</h1>
         <div className="space-y-6 text-white/60 leading-relaxed">
-          <p>By using CodeReview.AI, you agree to these terms.</p>
-          <p>Do not submit malicious code or attempt to abuse the service.</p>
-          <p>This service is provided as-is for educational purposes.</p>
+          <p>By using CodeReview.AI you agree to these terms.</p>
+          <p>Do not submit malicious code or abuse the service.</p>
           <p>Rate limits apply: 100 requests per minute per IP.</p>
         </div>
       </main>
