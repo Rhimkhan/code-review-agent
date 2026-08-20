@@ -5,9 +5,9 @@ DANGEROUS_PATTERNS = [
     (r"eval\s*\(", "Dangerous eval() usage", "HIGH"),
     (r"exec\s*\(", "Dangerous exec() usage", "HIGH"),
     (r"os\.system\s*\(", "Shell injection risk", "CRITICAL"),
-    (r"subprocess\.call\s*\(", "Subprocess usage detected", "MEDIUM"),
     (r"password\s*=\s*['\"][^'\"]+['\"]", "Hardcoded password", "CRITICAL"),
     (r"api_key\s*=\s*['\"][^'\"]+['\"]", "Hardcoded API key", "CRITICAL"),
+    (r"secret\s*=\s*['\"][^'\"]+['\"]", "Hardcoded secret", "HIGH"),
 ]
 
 def scan_patterns(code: str) -> List[Dict]:
