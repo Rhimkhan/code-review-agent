@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 from datetime import datetime
 
 def calculate_score(severity_counts: Dict) -> int:
@@ -8,7 +8,14 @@ def calculate_score(severity_counts: Dict) -> int:
         score -= deductions.get(severity, 0) * count
     return max(0, score)
 
+def get_score_label(score: int) -> str:
+    if score >= 90: return "Excellent"
+    if score >= 70: return "Good"
+    if score >= 50: return "Fair"
+    return "Needs Work"
+
 def format_review_response(result: Dict) -> Dict:
+    score = calculate_score(result.get("severity_counts", {}))
     return {
         "status": "success",
         "timestamp": datetime.now().isoformat(),
@@ -17,7 +24,8 @@ def format_review_response(result: Dict) -> Dict:
         "summary": result.get("summary", ""),
         "severity_counts": result.get("severity_counts", {}),
         "findings": result.get("findings", []),
-        "score": calculate_score(result.get("severity_counts", {}))
+        "score": score,
+        "score_label": get_score_label(score)
     }
 
 def format_finding(finding: Dict) -> str:
