@@ -67,3 +67,7 @@ class Orchestrator:
 
         self.tracer.end_trace(final)
         return final
+
+    async def review_multiple(self, files: List[Dict]) -> List[Dict]:
+        tasks = [self.review_code(f['code'], f['filename']) for f in files]
+        return await asyncio.gather(*tasks)
