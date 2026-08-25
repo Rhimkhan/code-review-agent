@@ -10,7 +10,11 @@ from src.middleware.rate_limiter import limiter
 
 load_dotenv()
 
-app = FastAPI(title="Code Review Agent", version="1.0.0")
+app = FastAPI(
+    title="Code Review Agent",
+    version="1.0.0",
+    description="Multi-agent AI code review system"
+)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
@@ -27,6 +31,10 @@ orchestrator = Orchestrator()
 @app.get("/health")
 async def health():
     return {"status": "ok", "version": "1.0.0", "agents": 3}
+
+@app.get("/ping")
+async def ping():
+    return {"message": "pong"}
 
 @app.post("/api/review/code")
 async def review_code(request: dict):
@@ -55,3 +63,12 @@ def process(a, b, c, d, e, f, g):
 """
     result = await orchestrator.review_code(code=demo_code, filename="demo.py")
     return {"status": "success", "review": result}
+
+@app.get("/api/info")
+async def info():
+    return {
+        "name": "Code Review Agent",
+        "version": "1.0.0",
+        "agents": ["SecurityAgent", "QualityAgent", "AnalystAgent"],
+        "supported_languages": ["python", "javascript", "typescript", "java", "go"]
+    }
