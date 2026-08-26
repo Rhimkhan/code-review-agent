@@ -62,7 +62,12 @@ class QualityAgent(BaseAgent):
                         'suggestion': 'Catch specific exceptions'
                     })
         except SyntaxError:
-            pass
+            findings.append({
+                'type': 'Quality', 'subtype': 'Syntax Error',
+                'line': 1, 'severity': 'CRITICAL',
+                'message': 'Code has syntax errors',
+                'suggestion': 'Fix syntax errors first'
+            })
         return findings
 
     def _calculate_metrics(self, code: str) -> Dict:
