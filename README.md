@@ -14,7 +14,7 @@ An AI-powered multi-agent system that reviews code for bugs, security vulnerabil
 - Bandit security scanning
 - Next.js frontend
 
-## Setup
+## Setup 
 cd backend
 python -m venv venv
 pip install -r requirements.txt, use UV command by Astral.sh instead of this 
@@ -65,3 +65,24 @@ In active development
 2. Set root directory to `frontend`
 3. Add NEXT_PUBLIC_API_URL
 4. Deploy!
+
+## Project Structure
+
+\`\`\`
+code-review-agent/
+├── backend/
+│   ├── src/
+│   │   ├── agents/          # AI agents
+│   │   ├── api/             # FastAPI routes
+│   │   ├── auth/            # GitHub OAuth
+│   │   ├── db/              # Database models
+│   │   ├── middleware/      # Rate limiting
+│   │   ├── observability/   # Tracing & metrics
+│   │   ├── security/        # Guardrails
+│   │   └── utils/           # Helpers
+│   └── tests/               # 20+ tests
+└── frontend/
+    ├── pages/               # Next.js pages
+    ├── components/          # Reusable components
+    └── styles/              # Global CSS
+\`\`\`
