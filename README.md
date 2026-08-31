@@ -107,3 +107,24 @@ code-review-agent/
     ├── components/          # Reusable components
     └── styles/              # Global CSS
 \`\`\`
+
+## Project Structure
+
+\`\`\`
+code-review-agent/
+├── backend/
+│   ├── src/
+│   │   ├── agents/          # AI agents
+│   │   ├── api/             # FastAPI routes
+│   │   ├── auth/            # GitHub OAuth
+│   │   ├── db/              # Database models
+│   │   ├── middleware/      # Rate limiting
+│   │   ├── observability/   # Tracing & metrics
+│   │   ├── security/        # Guardrails
+│   │   └── utils/           # Helpers
+│   └── tests/               # 20+ tests
+└── frontend/
+    ├── pages/               # Next.js pages
+    ├── components/          # Reusable components
+    └── styles/              # Global CSS
+\`\`\`
